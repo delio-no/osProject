@@ -1,5 +1,5 @@
 # osProject
 Читай os.pdf
 Для корректной рабоыт пишем в терминале:
-PATH=~/etc:$PATH
-PATH=~/bin:$PATH
+PATH=$HOME/etc:$PATH
+PATH=$HOME/bin:$PATH
