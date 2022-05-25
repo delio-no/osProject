@@ -1,0 +1,55 @@
+cd $HOME/usr/account_name
+v3=`ls | grep "\b$1\b" 2>/dev/null`
+
+if [ "$1" != "" ]; then
+	if [ "$1" = "$v3" ]; then
+		echo "Enter old password:"
+		read -s var
+		AD=`cat $HOME/etc/mpasswd | grep "\b$1\b"`
+		AB=`echo $AD | awk -F ":" '{print $2}'`
+		encryptPass=`echo ${AB} | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:slrORPWmPNbT7qYy`
+		
+		if [ "$var" = "$encryptPass" ]; then
+			echo "Enter new password:"
+			read -s var1
+			pass1=`echo "${var1}" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'slrORPWmPNbT7qYy'`			
+			sed -i "s|$AB|$pass1|" $HOME/etc/mpasswd 
+			echo "Password changed successfully"
+		else 
+			echo "Invalid password"
+		
+		fi	 
+	
+	else 
+		echo "This user does not exist"
+	fi
+
+else
+	echo "Enter username:"
+	read user 
+	v2=`ls | grep "\b$1\b" 2>/dev/null`
+	
+	if [ "$user" = "$v2" ]; then
+		echo "Enter old password:"
+		read -s var
+		AD=`cat $HOME/etc/mpasswd | grep "\b$user\b"`
+		AB=`echo $AD | awk -F ":" '{print $2}'`
+		encryptPass=`echo ${AB} | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'slrORPWmPNbT7qYy'`
+
+		if [ "$var" = "$encryptPass" ]; then
+			echo "Enter new password:"
+			read -s var1
+			pass1=`echo "${var1}" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'slrORPWmPNbT7qYy'`		
+			sed -i "s|$AB|$pass1|" $HOME/etc/mpasswd  
+			echo "Password changed successfully"
+		else 
+			echo "Invalid password"
+		
+		fi
+
+	else 
+		echo "This user does not exist"
+	fi
+
+fi	
+

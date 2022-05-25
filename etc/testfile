@@ -1,0 +1,28 @@
+cd $HOME/usr
+v3=`find $1 2>/dev/null`
+echo "Enter username:"
+read user 
+v2=`find $user 2>/dev/null`
+	#ПОЛУЧАЕМ СТРОКУ ПАРОЛЯ!!!!
+	echo "Enter old password:"
+	read -s var
+	AD=`cat $HOME/etc/testfile1 | grep "\b$user\b"`
+	AB=`echo $AD | awk -F ":" '{print $2}'`
+	echo $AB
+	encryptPass=`echo ${AB} | openssl enc -base64 -d -aes-256-cbc -iter 1000000 -pass pass:slrORPWmPNbT7qYy`
+	echo $encryptPass
+	if [ "$var" = "$encryptPass" ]; then
+			echo "Enter new password:"
+			read -s var1
+			pass1=`echo "${var1}" | openssl enc -base64 -aes-256-cbc -iter 1000000 -pass pass:slrORPWmPNbT7qYy`
+			echo $pass1
+			#cd $HOME/etc		
+			sed -i "s|$AB|$pass1|" $HOME/etc/testfile1
+			#echo $pass1 >  $HOME/etc/testfile1 | awk '{print $AB}'
+			echo "Password changed successfully"
+		else 
+			echo "Invalid password"
+		
+	fi
+
+

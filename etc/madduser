@@ -1,0 +1,41 @@
+cd $HOME/usr/account_name
+#v3=`find $1 2>/dev/null`
+v3=`ls | grep "\b$1\b" 2>/dev/null`
+
+
+if [ "$1" != "" ]; then
+	if [ "$1" = "$v3" ]; then 
+		echo "This user already exists"
+	else
+		echo "Enter password:"
+		read -s var
+		pass=`echo "${var}" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'slrORPWmPNbT7qYy'`
+		v4=${1}:${pass}:$HOME/usr/account_name/${1}:/bin/bash
+		echo $v4 >> $HOME/etc/mpasswd
+		echo $1 >> $HOME/var/log/log
+		touch $HOME/usr/mail/$1@mail
+		mkdir $HOME/usr/account_name/$1
+		touch $HOME/usr/account_name/$1/$1
+		echo "User" $1 "created"
+	fi	
+else
+	echo "Enter username:"
+	read user 
+	#v2=`find $user 2>/dev/null`
+	v2=`ls | grep "\b$1\b" 2>/dev/null`
+
+	if [ "$user" = "$v2" ]; then 
+			echo "This user already exists"
+	else
+			echo "Enter password:"	
+			read -s var
+			pass=`echo "${var}" | openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:'slrORPWmPNbT7qYy'`
+			v1=${user}:${pass}:$HOME/usr/account_name/${user}:/bin/bash
+			echo $v1 >> $HOME/etc/mpasswd
+			echo $user >> $HOME/var/log/log
+			touch $HOME/usr/mail/$user@mail
+			mkdir $HOME/usr/account_name/$user
+			touch $HOME/usr/account_name/$user/$user
+			echo "User" $user "created"
+	fi
+fi

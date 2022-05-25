@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+cd $HOME/usr/account_name
+#v3=`find $1 2>/dev/null`
+v3=`ls | grep "\b$1\b" 2>/dev/null`
+ver=`cat /etc/*release* | awk -F "=" 'NR == 4{print$2}' | cut -c2-19`
+curDate=`date`
+
+
+checkLog(){
+
+	lastDate=`cat $HOME/var/log/lastlog | grep "\b$1\b"`
+
+	if [ "$lastDate" != "" ]; then
+		presCurrDate=`echo $lastDate | awk -F "|" '{print $2}'`
+		echo -e "\n${presCurrDate}"
+		sed -i "s/$presCurrDate/Последний вход в систему: $curDate/" $HOME/var/log/lastlog
+	else
+		echo -e "\nFrom the first connection \n${curDate}"
+		echo "${1}|${curDate}" >> $HOME/var/log/lastlog
+	fi
+
+}
+
+
+if [ "$1" != "" ]; then
+	if [ "$1" = "$v3" ]; then
+		echo "Enter password:"
+		read -s var
+		AD=`cat $HOME/etc/mpasswd | grep "\b$1\b"`
+		AB=`echo $AD | awk -F ":" '{print $2}'`
+		encryptPass=`echo ${AB} | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:slrORPWmPNbT7qYy`
+
+		if [ "$var" = "$encryptPass" ]; then
+			checkLog $1
+			echo "Welcome to ${ver}"
+			cd ~/usr/account_name/$1
+			echo -e '\nHit [Ctrl]+[D] to exit this child shell.'
+			exec bash
+		else 
+			echo "Invalid password"
+		fi
+	else 
+		echo "This user does not exist"
+	fi		
+
+else
+	echo "Enter username:"
+	read user 
+	v2=`ls | grep "\b$user\b" 2>/dev/null`
+	
+	if [ "$user" = "$v2" ]; then
+		echo "Enter password:"
+		read -s var
+		AD=`cat $HOME/etc/mpasswd | grep "\b$user\b"`
+		AB=`echo $AD | awk -F ":" '{print $2}'`
+		encryptPass=`echo ${AB} | openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:'slrORPWmPNbT7qYy'`
+		
+		if [ "$var" = "$encryptPass" ]; then
+			checkLog $user
+			echo "Welcome to ${ver}"
+			cd ~/usr/account_name/$user
+			echo -e '\nHit [Ctrl]+[D] to exit this child shell.'
+			exec bash
+		else 
+			echo "Invalid password"
+		
+		fi
+
+	else 
+		echo "This user does not exist"
+	fi
+
+fi	

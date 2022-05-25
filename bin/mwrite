@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+cd $HOME/usr/account_name
+v2=`ls | grep "\b$1\b" 2>/dev/null`
+var1=`who | wc -l`
+var2=$(($var1-2))
+
+
+
+if [ "$1" != "" ]; then
+	if [ "$1" = "$v2" ]; then
+		cd $1
+		while :
+		do	
+			read msg
+
+			for (( i = 0; i <= $var2; i++))
+			do	
+				echo -e "\033[32mMessage from ${1}: ${msg}" >> /dev/pts/$i		
+				#~/etc/mvlog $msg $i $1
+				echo $msg >> $1
+				#echo $i
+			done			
+			
+		done
+	else 
+		echo "This user does not exist"
+	fi
+else 
+	echo "Empty argument"
+fi
